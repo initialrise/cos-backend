@@ -1,0 +1,74 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Dashboard
+    link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css")
+  body
+    .container.mt-5
+      .row
+        .col-md-6
+          h1.text-center Dashboard
+          if items && items.length > 0
+            each item in items
+              .card.mt-3
+                .card-body
+                  h5.card-title #{item.title}
+                  p.card-text Time: #{item.time} mins
+                  p.card-text Ratings: #{item.ratings}
+                  p.card-text Price: Rs #{item.price}
+          else
+            p No items found.
+
+        .col-md-6
+          .text-center
+            h2 Add Item
+            form#addItemForm
+              .form-group
+                label(for="newItemTitle") Title
+                input#newItemTitle.form-control(type="text", name="title", required)
+              .form-group
+                label(for="newItemTime") Time (mins)
+                input#newItemTime.form-control(type="number", name="time", required)
+              .form-group
+                label(for="newItemRatings") Ratings
+                input#newItemRatings.form-control(type="number", name="ratings", required)
+              .form-group
+                label(for="newItemPrice") Price (Rs)
+                input#newItemPrice.form-control(type="number", name="price", required)
+              button.btn.btn-success.btn-block#addItemSubmit(type="submit") Add
+
+    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+    script.
+      document.addEventListener('DOMContentLoaded', function () {
+        const addItemForm = document.getElementById('addItemForm');
+        const addItemSubmit = document.getElementById('addItemSubmit');
+
+        addItemForm.addEventListener('submit', async function (event) {
+          event.preventDefault();
+
+          const newItemTitle = document.getElementById('newItemTitle').value;
+          const newItemTime = document.getElementById('newItemTime').value;
+          const newItemRatings = document.getElementById('newItemRatings').value;
+          const newItemPrice = document.getElementById('newItemPrice').value;
+
+          try {
+            const response = await axios.post('/items', {
+              title: newItemTitle,
+              time: newItemTime,
+              ratings: newItemRatings,
+              price: newItemPrice
+            });
+
+            if (response.status === 200) {
+              console.log('Item added successfully:', response.data);
+              window.location.reload(); 
+            } else {
+              console.error('Failed to add item:', response.data);
+            }
+          } catch (error) {
+            console.error('Failed to add item:', error.response.data);
+          }
+        });
+      });

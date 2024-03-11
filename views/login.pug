@@ -1,0 +1,59 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Login Panel
+    link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css")
+  body
+    .container
+      .row.justify-content-center.mt-5
+        .col-md-6
+          .card
+            .card-header
+              h3.text-center#err Login
+            .card-body
+              form#login-form(action="/login", method="post")
+                .form-group
+                  label(for="username") Username
+                  input.form-control(type="text", id="username", name="username" required)
+                .form-group
+                  label(for="password") Password
+                  input.form-control(type="password", id="password", name="password" required)
+                button.btn.btn-primary.btn-block(type="submit") Submit
+
+    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+    script.
+      document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('#login-form');
+        const errorMessage = document.querySelector('#err');
+
+        form.addEventListener('submit', async function (event) {
+          event.preventDefault();
+
+          const formData = new FormData(form);
+          const jsonData = {};
+          formData.forEach((value, key) => {
+            jsonData[key] = value;
+          });
+
+          try {
+            const response = await axios.post('/login', jsonData, {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+
+            if (response.status === 200) {
+              console.log('Login successful:', response.data);
+              window.location.href = '/dashboard'; // Redirect to dashboard on successful login
+            } else {
+              console.error('Login failed:', response.data);
+              errorMessage.innerHTML = "Login Failed"; // Display login failed message
+            }
+          } catch (error) {
+            console.error('Login failed:', error.response.data);
+            errorMessage.innerHTML = "Login Failed"; // Display login failed message
+          }
+        });
+      });
